@@ -7,7 +7,7 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>EvacSafe</Text>
+      <Text style={styles.title}>SafeEvac</Text>
       <Button title="Ver rotas seguras" onPress={() => navigation.navigate('Routes')} />
       <Button title="Registrar alerta" onPress={() => navigation.navigate('AlertForm')} />
       <Button title="Perfil" onPress={() => navigation.navigate('Profile')} />
@@ -17,6 +17,6 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 20 },
+  container: { flex: 1, justifyContent: 'center', padding: 20, gap: 10 },
   title: { fontSize: 32, fontWeight: 'bold', marginBottom: 40, textAlign: 'center' },
 });
