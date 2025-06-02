@@ -1,14 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, Switch, Button, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Profile() {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [mobilidadeReduzida, setMobilidadeReduzida] = useState(false);
 
-  function salvarPerfil() {
-    Alert.alert('Perfil salvo!', `Nome: ${nome}\nEmail: ${email}\nMobilidade Reduzida: ${mobilidadeReduzida ? 'Sim' : 'Não'}`);
+  const PERFIL_KEY = '@perfilUsuario';
+
+  async function salvarPerfil() {
+    const perfil = {
+      nome,
+      email,
+      mobilidadeReduzida
+    };
+
+    try {
+      await AsyncStorage.setItem(PERFIL_KEY, JSON.stringify(perfil));
+      Alert.alert('Perfil salvo com sucesso!');
+    } catch (error) {
+      Alert.alert('Erro ao salvar perfil.');
+    }
   }
+
+  async function carregarPerfil() {
+    try {
+      const dados = await AsyncStorage.getItem(PERFIL_KEY);
+      if (dados) {
+        const perfil = JSON.parse(dados);
+        setNome(perfil.nome);
+        setEmail(perfil.email);
+        setMobilidadeReduzida(perfil.mobilidadeReduzida);
+      }
+    } catch (error) {
+      Alert.alert('Erro ao carregar perfil.');
+    }
+  }
+
+  useEffect(() => {
+    carregarPerfil();
+  }, []);
 
   return (
     <View style={styles.container}>
