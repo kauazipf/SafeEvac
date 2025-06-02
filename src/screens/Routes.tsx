@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, StyleSheet, Dimensions, Alert, ActivityIndicator,
+  View, StyleSheet, Dimensions, ActivityIndicator,
   Text, Switch, Button, Modal
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
+import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { rotasSeguras, Rota } from '../data/rotas';
 import { criarAlerta } from '../services/alertaService';
+import { showError, showSuccess } from '../utils/toast';
 
 export default function Routes() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
@@ -17,30 +19,68 @@ export default function Routes() {
   const [rotaSelecionada, setRotaSelecionada] = useState<Rota | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  async function carregarPerfilEFiltrarRotas(localizacao?: Location.LocationObject) {
+  const notifiedSet = new Set<number>();
+
+  async function solicitarPermissaoNotificacao() {
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status !== 'granted') {
+      showError('Permissão de notificação negada');
+    }
+  }
+
+  async function carregarPerfilEFiltrarRotas(loc?: Location.LocationObject) {
     try {
       const perfilData = await AsyncStorage.getItem('@perfilUsuario');
       const perfil = perfilData ? JSON.parse(perfilData) : null;
       const isAcessivel = perfil?.mobilidadeReduzida ?? false;
 
       setApenasAcessiveis(isAcessivel);
-
-      const filtradas = rotasSeguras.filter((r) => {
-        return !isAcessivel || r.acessivel;
-      });
-
+      const filtradas = rotasSeguras.filter((r) => !isAcessivel || r.acessivel);
       setRotasFiltradas(filtradas);
-      if (localizacao) setLocation(localizacao);
-    } catch (error) {
-      Alert.alert('Erro ao carregar perfil');
+      if (loc) setLocation(loc);
+    } catch {
+      showError('Erro ao carregar perfil');
     }
+  }
+
+  function calcularDistancia(lat1: number, lon1: number, lat2: number, lon2: number) {
+    const toRad = (x: number) => x * Math.PI / 180;
+    const R = 6371e3;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  async function monitorarProximidade() {
+    const posicao = await Location.getCurrentPositionAsync({});
+    const { latitude, longitude } = posicao.coords;
+
+    rotasSeguras.forEach(async (rota) => {
+      if (!rota.acessivel && !notifiedSet.has(rota.id)) {
+        const distancia = calcularDistancia(latitude, longitude, rota.latitude, rota.longitude);
+        if (distancia < 100) {
+          await Notifications.scheduleNotificationAsync({
+            content: {
+              title: '⚠️ Atenção!',
+              body: `Você está se aproximando de uma rota não acessível: ${rota.nome}`,
+              sound: true,
+            },
+            trigger: null,
+          });
+          notifiedSet.add(rota.id);
+        }
+      }
+    });
   }
 
   useEffect(() => {
     (async () => {
+      await solicitarPermissaoNotificacao();
+
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permissão de localização negada');
+        showError('Permissão de localização negada');
         setLoading(false);
         return;
       }
@@ -48,8 +88,14 @@ export default function Routes() {
       try {
         const loc = await Location.getCurrentPositionAsync({});
         await carregarPerfilEFiltrarRotas(loc);
+
+        const interval = setInterval(() => {
+          monitorarProximidade();
+        }, 15000);
+
+        return () => clearInterval(interval);
       } catch (error) {
-        Alert.alert('Erro ao obter localização');
+        showError('Erro ao obter localização');
       } finally {
         setLoading(false);
       }
@@ -57,19 +103,17 @@ export default function Routes() {
   }, []);
 
   useEffect(() => {
-    const filtradas = rotasSeguras.filter((r) => {
-      return !apenasAcessiveis || r.acessivel;
-    });
+    const filtradas = rotasSeguras.filter((r) => !apenasAcessiveis || r.acessivel);
     setRotasFiltradas(filtradas);
   }, [apenasAcessiveis]);
 
   async function salvarAlertaComRota(rota: Rota) {
     try {
       await criarAlerta({ local: rota.nome, tipo: 'Evacuação sugerida' });
-      Alert.alert('Alerta salvo com base na rota!');
+      showSuccess('Alerta salvo com base na rota!');
       setModalVisible(false);
-    } catch (error) {
-      Alert.alert('Erro ao salvar alerta');
+    } catch {
+      showError('Erro ao salvar alerta');
     }
   }
 

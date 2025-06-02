@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Button, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import { Alerta } from '../types/Alerta';
 import { criarAlerta, listarAlertas } from '../services/alertaService';
+import { showError, showSuccess } from '../utils/toast';
 
 export default function AlertForm() {
   const [local, setLocal] = useState('');
@@ -11,19 +12,19 @@ export default function AlertForm() {
 
   async function salvarAlerta() {
     if (!local.trim() || !tipo.trim()) {
-      Alert.alert('Preencha todos os campos');
+      showError('Preencha todos os campos');
       return;
     }
 
     try {
       setLoading(true);
       await criarAlerta({ local, tipo });
-      Alert.alert('Alerta registrado!');
+      showSuccess('Alerta registrado com sucesso!');
       setLocal('');
       setTipo('');
       await carregarAlertas();
     } catch (err) {
-      Alert.alert('Erro ao registrar alerta');
+      showError('Erro ao registrar alerta');
     } finally {
       setLoading(false);
     }
@@ -35,7 +36,7 @@ export default function AlertForm() {
       const dados = await listarAlertas();
       setAlertas(dados);
     } catch (err) {
-      Alert.alert('Erro ao buscar alertas');
+      showError('Erro ao buscar alertas');
     } finally {
       setLoading(false);
     }
@@ -49,19 +50,8 @@ export default function AlertForm() {
     <View style={styles.container}>
       <Text style={styles.title}>Cadastrar Alerta</Text>
 
-      <TextInput
-        placeholder="Local"
-        value={local}
-        onChangeText={setLocal}
-        style={styles.input}
-      />
-
-      <TextInput
-        placeholder="Tipo de risco"
-        value={tipo}
-        onChangeText={setTipo}
-        style={styles.input}
-      />
+      <TextInput placeholder="Local" value={local} onChangeText={setLocal} style={styles.input} />
+      <TextInput placeholder="Tipo de risco" value={tipo} onChangeText={setTipo} style={styles.input} />
 
       <Button title="Salvar Alerta" onPress={salvarAlerta} disabled={loading} />
 
