@@ -1,31 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet, Alert } from 'react-native';
-import { api } from '../services/api';
-import { Alerta } from './../types/Alerta';
+import { View, Text, TextInput, Button, FlatList, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { Alerta } from '../types/Alerta';
+import { criarAlerta, listarAlertas } from '../services/alertaService';
 
 export default function AlertForm() {
   const [local, setLocal] = useState('');
   const [tipo, setTipo] = useState('');
   const [alertas, setAlertas] = useState<Alerta[]>([]);
+  const [loading, setLoading] = useState(false);
 
   async function salvarAlerta() {
+    if (!local.trim() || !tipo.trim()) {
+      Alert.alert('Preencha todos os campos');
+      return;
+    }
+
     try {
-      await api.post('/alertas', { local, tipo });
+      setLoading(true);
+      await criarAlerta({ local, tipo });
       Alert.alert('Alerta registrado!');
       setLocal('');
       setTipo('');
-      carregarAlertas();
+      await carregarAlertas();
     } catch (err) {
       Alert.alert('Erro ao registrar alerta');
+    } finally {
+      setLoading(false);
     }
   }
 
   async function carregarAlertas() {
     try {
-      const response = await api.get<Alerta[]>('/alertas');
-      setAlertas(response.data);
+      setLoading(true);
+      const dados = await listarAlertas();
+      setAlertas(dados);
     } catch (err) {
       Alert.alert('Erro ao buscar alertas');
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -36,9 +48,25 @@ export default function AlertForm() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Cadastrar Alerta</Text>
-      <TextInput placeholder="Local" value={local} onChangeText={setLocal} style={styles.input} />
-      <TextInput placeholder="Tipo de risco" value={tipo} onChangeText={setTipo} style={styles.input} />
-      <Button title="Salvar Alerta" onPress={salvarAlerta} />
+
+      <TextInput
+        placeholder="Local"
+        value={local}
+        onChangeText={setLocal}
+        style={styles.input}
+      />
+
+      <TextInput
+        placeholder="Tipo de risco"
+        value={tipo}
+        onChangeText={setTipo}
+        style={styles.input}
+      />
+
+      <Button title="Salvar Alerta" onPress={salvarAlerta} disabled={loading} />
+
+      {loading && <ActivityIndicator size="large" style={{ marginTop: 20 }} />}
+
       <Text style={styles.subtitle}>Alertas Registrados:</Text>
       <FlatList
         data={alertas}
