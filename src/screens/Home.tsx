@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import i18n from '../i18n/translations';
 import { RootDrawerParamList } from './../types/NavigationTyoes';
+import { colors } from '../styles/theme';
 
 // Navegação tipada
 type NavigationProps = DrawerNavigationProp<RootDrawerParamList>;
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 24,
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.gray,
   },
   logo: {
     width: 180,
@@ -79,13 +80,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
-    color: '#028220',
+    color: colors.primary,
   },
   text: {
     fontSize: 16,
     marginVertical: 10,
     textAlign: 'center',
-    color: '#333',
+    color: colors.text,
   },
   subtitle: {
     fontSize: 20,
@@ -93,31 +94,36 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 10,
     textAlign: 'center',
+    color: colors.secondary,
   },
   bullet: {
     fontSize: 16,
     textAlign: 'left',
     alignSelf: 'stretch',
     marginVertical: 4,
+    color: colors.text,
   },
   cardContainer: {
     marginTop: 20,
     width: '100%',
   },
   card: {
-    backgroundColor: '#f2f2f2',
+    backgroundColor: colors.white,
     borderRadius: 12,
     padding: 20,
     marginVertical: 10,
-    elevation: 3,
+    elevation: 2,
+    borderLeftWidth: 5,
+    borderLeftColor: colors.primary,
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 6,
+    color: colors.primary,
   },
   cardText: {
     fontSize: 14,
-    color: '#555',
+    color: colors.text,
   },
 });

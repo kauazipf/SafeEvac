@@ -1,75 +1,126 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import {
+  View, Text, TextInput, FlatList, Button, StyleSheet,
+  ActivityIndicator, Modal
+} from 'react-native';
 import { Alerta } from '../types/Alerta';
-import { criarAlerta, listarAlertas } from '../services/alertaService';
-import { showError, showSuccess } from '../utils/toast';
+import {
+  criarAlerta, listarAlertas,
+  atualizarAlerta, excluirAlerta
+} from '../services/alertaService';
+import Animated, { FadeIn } from 'react-native-reanimated';
+import { colors } from '../styles/theme';
 
 export default function AlertForm() {
   const [local, setLocal] = useState('');
   const [tipo, setTipo] = useState('');
   const [alertas, setAlertas] = useState<Alerta[]>([]);
   const [loading, setLoading] = useState(false);
-
-  async function salvarAlerta() {
-    if (!local.trim() || !tipo.trim()) {
-      showError('Preencha todos os campos');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      await criarAlerta({ local, tipo });
-      showSuccess('Alerta registrado com sucesso!');
-      setLocal('');
-      setTipo('');
-      await carregarAlertas();
-    } catch (err) {
-      showError('Erro ao registrar alerta');
-    } finally {
-      setLoading(false);
-    }
-  }
+  const [editandoId, setEditandoId] = useState<number | null>(null);
+  const [modalVisivel, setModalVisivel] = useState(false);
 
   async function carregarAlertas() {
-    try {
-      setLoading(true);
-      const dados = await listarAlertas();
-      setAlertas(dados);
-    } catch (err) {
-      showError('Erro ao buscar alertas');
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    const data = await listarAlertas();
+    setAlertas(data);
+    setLoading(false);
   }
 
   useEffect(() => {
     carregarAlertas();
   }, []);
 
+  async function salvarAlerta() {
+    if (!local.trim() || !tipo.trim()) return;
+    setLoading(true);
+    if (editandoId !== null) {
+      await atualizarAlerta(editandoId, { local, tipo });
+    } else {
+      await criarAlerta({ local, tipo });
+    }
+    setLocal('');
+    setTipo('');
+    setEditandoId(null);
+    setModalVisivel(false);
+    await carregarAlertas();
+    setLoading(false);
+  }
+
+  async function handleEditar(alerta: Alerta) {
+    setEditandoId(alerta.id);
+    setLocal(alerta.local);
+    setTipo(alerta.tipo);
+    setModalVisivel(true);
+  }
+
+  async function handleExcluir(id: number) {
+    setLoading(true);
+    await excluirAlerta(id);
+    await carregarAlertas();
+    setLoading(false);
+  }
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Cadastrar Alerta</Text>
+    <Animated.View entering={FadeIn.duration(800)} style={styles.container}>
+      <Text style={styles.title}>Alertas Registrados</Text>
 
-      <TextInput placeholder="Local" value={local} onChangeText={setLocal} style={styles.input} />
-      <TextInput placeholder="Tipo de risco" value={tipo} onChangeText={setTipo} style={styles.input} />
+      {loading && <ActivityIndicator size="large" color={colors.primary} />}
 
-      <Button title="Salvar Alerta" onPress={salvarAlerta} disabled={loading} />
-
-      {loading && <ActivityIndicator size="large" style={{ marginTop: 20 }} />}
-
-      <Text style={styles.subtitle}>Alertas Registrados:</Text>
       <FlatList
         data={alertas}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <Text>📍 {item.local} — {item.tipo}</Text>}
+        renderItem={({ item }) => (
+          <View style={styles.itemRow}>
+            <Text style={styles.item}>📍 {item.local} — {item.tipo}</Text>
+            <View style={styles.buttons}>
+              <Button title="Editar" onPress={() => handleEditar(item)} />
+              <Button title="Excluir" color={colors.danger} onPress={() => handleExcluir(item.id)} />
+            </View>
+          </View>
+        )}
       />
-    </View>
+
+      <Button title="Novo Alerta" onPress={() => setModalVisivel(true)} />
+
+      <Modal visible={modalVisivel} animationType="slide">
+        <View style={styles.modalContent}>
+          <Text style={styles.subtitle}>{editandoId ? 'Editar Alerta' : 'Novo Alerta'}</Text>
+          <TextInput style={styles.input} placeholder="Local" value={local} onChangeText={setLocal} />
+          <TextInput style={styles.input} placeholder="Tipo de risco" value={tipo} onChangeText={setTipo} />
+          <Button title="Salvar" onPress={salvarAlerta} />
+          <Button title="Cancelar" color="gray" onPress={() => {
+            setEditandoId(null);
+            setModalVisivel(false);
+            setLocal('');
+            setTipo('');
+          }} />
+        </View>
+      </Modal>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
-  input: { borderWidth: 1, padding: 10, marginVertical: 5, borderRadius: 5 },
-  subtitle: { fontSize: 18, marginTop: 20, fontWeight: 'bold' },
+  container: { flex: 1, padding: 24, backgroundColor: colors.gray },
+  title: { fontSize: 26, fontWeight: 'bold', color: colors.primary, textAlign: 'center', marginBottom: 20 },
+  input: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 10,
+    borderRadius: 6,
+    marginBottom: 12,
+    backgroundColor: colors.white,
+    color: colors.text,
+  },
+  subtitle: { fontSize: 20, fontWeight: '600', color: colors.secondary, marginBottom: 10 },
+  item: { fontSize: 16, color: colors.text },
+  itemRow: {
+    backgroundColor: colors.white,
+    padding: 10,
+    marginVertical: 8,
+    borderRadius: 8,
+    elevation: 1,
+  },
+  buttons: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, gap: 10 },
+  modalContent: { flex: 1, padding: 24, backgroundColor: colors.white, justifyContent: 'center' },
 });
