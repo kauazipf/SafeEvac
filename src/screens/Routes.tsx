@@ -5,7 +5,6 @@ import {
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { rotasSeguras, Rota } from '../data/rotas';
 import { criarAlerta } from '../services/alertaService';
@@ -20,13 +19,6 @@ export default function Routes() {
   const [modalVisible, setModalVisible] = useState(false);
 
   const notifiedSet = new Set<number>();
-
-  async function solicitarPermissaoNotificacao() {
-    const { status } = await Notifications.requestPermissionsAsync();
-    if (status !== 'granted') {
-      showError('Permissão de notificação negada');
-    }
-  }
 
   async function carregarPerfilEFiltrarRotas(loc?: Location.LocationObject) {
     try {
@@ -60,14 +52,6 @@ export default function Routes() {
       if (!rota.acessivel && !notifiedSet.has(rota.id)) {
         const distancia = calcularDistancia(latitude, longitude, rota.latitude, rota.longitude);
         if (distancia < 100) {
-          await Notifications.scheduleNotificationAsync({
-            content: {
-              title: '⚠️ Atenção!',
-              body: `Você está se aproximando de uma rota não acessível: ${rota.nome}`,
-              sound: true,
-            },
-            trigger: null,
-          });
           notifiedSet.add(rota.id);
         }
       }
@@ -76,14 +60,6 @@ export default function Routes() {
 
   useEffect(() => {
     (async () => {
-      await solicitarPermissaoNotificacao();
-
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        showError('Permissão de localização negada');
-        setLoading(false);
-        return;
-      }
 
       try {
         const loc = await Location.getCurrentPositionAsync({});

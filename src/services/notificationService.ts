@@ -1,6 +1,3 @@
-import React from 'react';
-import AppRoutes from './src/routes';
-import Toast from 'react-native-toast-message';
 import { Alert } from 'react-native';
 
 export function dispararNotificacaoFake() {
@@ -10,13 +7,4 @@ export function dispararNotificacaoFake() {
       'Verifique as rotas seguras disponíveis agora.'
     );
   }, 2000);
-}
-
-export default function App() {
-  return (
-    <>
-      <AppRoutes />
-      <Toast />
-    </>
-  );
 }

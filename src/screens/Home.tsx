@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, Button, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Button, ScrollView, TouchableOpacity } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import i18n from '../i18n/translations';
-import { RootDrawerParamList } from './../types/NavigationTyoes';
+import { RootDrawerParamList } from './../types/NavigationTypes';
+import { dispararNotificacaoFake } from './../services/notificationService';
 import { colors } from '../styles/theme';
 
 // Navegação tipada
@@ -16,15 +17,12 @@ export default function Home() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Animated.View entering={FadeIn.duration(800)}>
-        {/* Substitua ou ative a logo se quiser */}
-        {/* <Image source={require('../assets/evacsafe-logo.png')} style={styles.logo} resizeMode="contain" /> */}
-
         <Text style={styles.title}>{i18n.t('welcome')}</Text>
         <Text style={styles.text}>{i18n.t('intro')}</Text>
 
         <Text style={styles.text}>
           Através de rotas seguras e acessíveis, especialmente pensadas para pessoas com mobilidade reduzida,
-          o EvacSafe ajuda você a encontrar rapidamente o ponto de evacuação mais próximo e registrar alertas
+          o SafeEvac ajuda você a encontrar rapidamente o ponto de evacuação mais próximo e registrar alertas
           em tempo real.
         </Text>
 
@@ -50,6 +48,10 @@ export default function Home() {
             onPress={() => navigation.navigate('Perfil')}
           />
         </View>
+
+        <View style={{ marginTop: 24 }}>
+          <Button title="Testar Alerta" onPress={dispararNotificacaoFake} />
+        </View>
       </Animated.View>
     </ScrollView>
   );
@@ -69,11 +71,6 @@ const styles = StyleSheet.create({
     padding: 24,
     alignItems: 'center',
     backgroundColor: colors.gray,
-  },
-  logo: {
-    width: 180,
-    height: 100,
-    marginBottom: 20,
   },
   title: {
     fontSize: 26,
