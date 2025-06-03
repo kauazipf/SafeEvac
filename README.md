@@ -119,3 +119,5 @@ npx expo start
 ### 💡 Observações Finais
 
 - Este projeto faz parte da entrega do Global Solution 2025/1, integrando conhecimentos de desenvolvimento mobile com responsabilidade social e apoio a pessoas em vulnerabilidade.
+- O botão de notificação presente no app é uma simulação local de uma possível notificação, que poderá ser enviada automaticamente ao usuário caso ele esteja próximo de uma área de risco identificada no sistema.
+
