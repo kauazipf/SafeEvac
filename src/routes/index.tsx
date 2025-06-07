@@ -1,7 +1,7 @@
 import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import { Alert, TouchableOpacity, View, Text } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import Home from './../screens/Home';

@@ -1,4 +1,4 @@
-## 🧭 SafeEvac – Sistema de Evacuação Inteligente
+## 🧭 Terra Segura – Sistema de Evacuação Inteligente
 
 **Disciplina:** Mobile Application Development  
 **Curso:** Análise e Desenvolvimento de Sistemas – FIAP  
@@ -16,7 +16,7 @@
 
 ### 📱 Sobre o Projeto
 
-O **SafeEvac** é um aplicativo móvel desenvolvido com React Native que tem como objetivo auxiliar a evacuação de áreas de risco durante eventos extremos como enchentes, incêndios ou deslizamentos. O app é voltado especialmente para **pessoas com mobilidade reduzida**, oferecendo rotas acessíveis, alertas em tempo real e perfil com informações pessoais relevantes.
+O **Terra Segura** é um aplicativo móvel desenvolvido com React Native que tem como objetivo auxiliar a evacuação de áreas de risco durante eventos extremos como enchentes, incêndios ou deslizamentos. O app é voltado especialmente para **pessoas com mobilidade reduzida**, oferecendo rotas acessíveis, alertas em tempo real e perfil com informações pessoais relevantes.
 
 ---
 
@@ -126,8 +126,7 @@ src/
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/kauazipf/SafeEvac.git
-cd safeevac
+git clone https://github.com/kauazipf/Terra-Segura.git
 ```
 
 2. Instale as dependências:

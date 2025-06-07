@@ -114,7 +114,7 @@ export default function MapScreen() {
 const styles = StyleSheet.create({
   controls: {
     position: 'absolute',
-    bottom: 30,
+    bottom: 50,
     left: 20,
     right: 20,
     backgroundColor: colors.white,

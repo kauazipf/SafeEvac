@@ -32,7 +32,7 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>SafeEvac</Text>
+      <Text style={styles.title}> Terra Segura</Text>
       <Text style={styles.subtitle}>Acesso Seguro</Text>
 
       <TextInput

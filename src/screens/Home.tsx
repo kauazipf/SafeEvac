@@ -15,10 +15,10 @@ export default function Home() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Animated.View entering={FadeIn.duration(800)}>
-        <Text style={styles.title}>Bem-vindo ao SafeEvac</Text>
+        <Text style={styles.title}>Bem-vindo ao Terra Segura</Text>
 
         <Text style={styles.text}>
-          O SafeEvac é um aplicativo inteligente para evacuação de áreas de risco, com foco em acessibilidade,
+          O Terra Segura é um aplicativo inteligente para evacuação de áreas de risco, com foco em acessibilidade,
           inclusão e agilidade em situações de emergência.
         </Text>
 
@@ -112,12 +112,13 @@ const styles = StyleSheet.create({
   cardContainer: {
     marginTop: 20,
     width: '100%',
+    marginBottom: 32,
   },
   card: {
     backgroundColor: colors.white,
     borderRadius: 12,
     padding: 20,
-    marginVertical: 10,
+    marginVertical: 12,
     elevation: 2,
     borderLeftWidth: 5,
     borderLeftColor: colors.primary,

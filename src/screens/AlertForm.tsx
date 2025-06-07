@@ -202,10 +202,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: colors.primary,
-    marginTop: 24,
+    marginTop: 32,
     marginBottom: 24,
   },
   addButton: {
@@ -214,6 +214,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 6,
     elevation: 2,
+    marginTop: 16,
   },
   addButtonText: {
     color: colors.white,
@@ -223,8 +224,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: 12,
     padding: 20,
-    marginTop: 24 ,
-    marginBottom: 24,
+    marginTop: 12 ,
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -285,7 +286,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   flatList: {
-    maxHeight: 600,
+    maxHeight: 550,
   },
   flatListContainer: {
     paddingBottom: 20,
@@ -294,7 +295,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 24,
+    marginTop: 8,
   },
   pageButton: {
     backgroundColor: colors.primary,
