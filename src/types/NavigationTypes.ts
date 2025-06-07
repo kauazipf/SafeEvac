@@ -1,6 +1,6 @@
 export type RootDrawerParamList = {
   'Início': undefined;
-  'Rotas Seguras': undefined;
+  'Mapa': undefined;
   'Alertas': undefined;
   'Perfil': undefined;
   'Ajuda': undefined;

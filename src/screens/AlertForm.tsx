@@ -1,126 +1,313 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  View, Text, TextInput, FlatList, Button, StyleSheet,
-  ActivityIndicator, Modal
+  View,
+  Text,
+  TextInput,
+  Button,
+  FlatList,
+  Modal,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
 } from 'react-native';
-import { Alerta } from '../types/Alerta';
+import { Picker } from '@react-native-picker/picker';
+import { Regiao, NivelRisco } from '../types/Region';
 import {
-  criarAlerta, listarAlertas,
-  atualizarAlerta, excluirAlerta
-} from '../services/alertaService';
-import Animated, { FadeIn } from 'react-native-reanimated';
+  listarRegioes,
+  criarRegiao,
+  atualizarRegiao,
+  deletarRegiao,
+} from '../services/regionService';
 import { colors } from '../styles/theme';
+import { Ionicons } from '@expo/vector-icons';
 
-export default function AlertForm() {
-  const [local, setLocal] = useState('');
-  const [tipo, setTipo] = useState('');
-  const [alertas, setAlertas] = useState<Alerta[]>([]);
-  const [loading, setLoading] = useState(false);
+export default function RegionForm() {
+  const [regioes, setRegioes] = useState<Regiao[]>([]);
+  const [form, setForm] = useState<Regiao>({
+    nome: '',
+    latitude: 0,
+    longitude: 0,
+    descricao: '',
+    nivelRisco: 'BAIXO',
+  });
   const [editandoId, setEditandoId] = useState<number | null>(null);
-  const [modalVisivel, setModalVisivel] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [paginaAtual, setPaginaAtual] = useState(0);
+  const [ultimaPagina, setUltimaPagina] = useState(false);
+  const [totalPaginas, setTotalPaginas] = useState(1);
 
-  async function carregarAlertas() {
-    setLoading(true);
-    const data = await listarAlertas();
-    setAlertas(data);
-    setLoading(false);
-  }
+  const carregarRegioes = async (pagina = 0) => {
+    try {
+      const res = await listarRegioes(pagina);
+      setRegioes(res.data.content || []);
+      setPaginaAtual(res.data.number);
+      setUltimaPagina(res.data.last);
+      setTotalPaginas(res.data.totalPages);
+    } catch {
+      Alert.alert('Erro', 'Falha ao carregar regiões');
+    }
+  };
+
+  const salvar = async () => {
+    try {
+      if (editandoId) {
+        await atualizarRegiao(editandoId, form);
+        Alert.alert('Sucesso', 'Região atualizada');
+      } else {
+        await criarRegiao(form);
+        Alert.alert('Sucesso', 'Região criada');
+      }
+      setForm({ nome: '', latitude: 0, longitude: 0, descricao: '', nivelRisco: 'BAIXO' });
+      setEditandoId(null);
+      setModalVisible(false);
+      setTimeout(() => carregarRegioes(paginaAtual), 300);
+    } catch {
+      Alert.alert('Erro', 'Falha ao salvar dados');
+    }
+  };
+
+  const excluir = async (id: number) => {
+    Alert.alert('Confirmar', 'Deseja remover a região?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Remover',
+        style: 'destructive',
+        onPress: async () => {
+          await deletarRegiao(id);
+          carregarRegioes(paginaAtual);
+        },
+      },
+    ]);
+  };
+
+  const editar = (regiao: Regiao) => {
+    setForm(regiao);
+    setEditandoId(regiao.id || null);
+    setModalVisible(true);
+  };
+
+  const getIconByRisco = (nivel: NivelRisco) => {
+    switch (nivel) {
+      case 'BAIXO': return <Ionicons name="checkmark-circle" size={24} color="green" />;
+      case 'MEDIO': return <Ionicons name="alert-circle" size={24} color="orange" />;
+      case 'ALTO': return <Ionicons name="warning" size={24} color="darkorange" />;
+      case 'CRITICO': return <Ionicons name="alert" size={24} color="red" />;
+      default: return null;
+    }
+  };
 
   useEffect(() => {
-    carregarAlertas();
+    carregarRegioes();
   }, []);
 
-  async function salvarAlerta() {
-    if (!local.trim() || !tipo.trim()) return;
-    setLoading(true);
-    if (editandoId !== null) {
-      await atualizarAlerta(editandoId, { local, tipo });
-    } else {
-      await criarAlerta({ local, tipo });
-    }
-    setLocal('');
-    setTipo('');
-    setEditandoId(null);
-    setModalVisivel(false);
-    await carregarAlertas();
-    setLoading(false);
-  }
-
-  async function handleEditar(alerta: Alerta) {
-    setEditandoId(alerta.id);
-    setLocal(alerta.local);
-    setTipo(alerta.tipo);
-    setModalVisivel(true);
-  }
-
-  async function handleExcluir(id: number) {
-    setLoading(true);
-    await excluirAlerta(id);
-    await carregarAlertas();
-    setLoading(false);
-  }
-
   return (
-    <Animated.View entering={FadeIn.duration(800)} style={styles.container}>
-      <Text style={styles.title}>Alertas Registrados</Text>
-
-      {loading && <ActivityIndicator size="large" color={colors.primary} />}
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Regiões Monitoradas</Text>
+        <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
+          <Text style={styles.addButtonText}>+ Nova Região</Text>
+        </TouchableOpacity>
+      </View>
 
       <FlatList
-        data={alertas}
-        keyExtractor={(item) => item.id.toString()}
+        style={styles.flatList}
+        contentContainerStyle={styles.flatListContainer}
+        data={regioes}
+        keyExtractor={(item) => item.id?.toString() || ''}
         renderItem={({ item }) => (
-          <View style={styles.itemRow}>
-            <Text style={styles.item}>📍 {item.local} — {item.tipo}</Text>
-            <View style={styles.buttons}>
-              <Button title="Editar" onPress={() => handleEditar(item)} />
-              <Button title="Excluir" color={colors.danger} onPress={() => handleExcluir(item.id)} />
+          <View style={styles.card}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              {getIconByRisco(item.nivelRisco)}
+              <Text style={styles.item}><Text style={styles.label}>Nível de Risco:</Text> {item.nivelRisco}</Text>
+            </View>
+            <Text style={styles.item}><Text style={styles.label}>Nome:</Text> {item.nome}</Text>
+            <Text style={styles.item}><Text style={styles.label}>Descrição:</Text> {item.descricao}</Text>
+            <Text style={styles.item}><Text style={styles.label}>Coordenadas:</Text> {item.latitude}, {item.longitude}</Text>
+            <View style={styles.cardButtons}>
+              <TouchableOpacity style={styles.editButton} onPress={() => editar(item)}>
+                <Text style={styles.buttonText}>EDITAR</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.deleteButton} onPress={() => excluir(item.id!)}>
+                <Text style={styles.buttonText}>EXCLUIR</Text>
+              </TouchableOpacity>
             </View>
           </View>
         )}
       />
 
-      <Button title="Novo Alerta" onPress={() => setModalVisivel(true)} />
+      <View style={styles.pagination}>
+        <TouchableOpacity
+          disabled={paginaAtual === 0}
+          onPress={() => carregarRegioes(paginaAtual - 1)}
+          style={[styles.pageButton, paginaAtual === 0 && { opacity: 0.4 }]}
+        >
+          <Text style={styles.pageText}>Anterior</Text>
+        </TouchableOpacity>
 
-      <Modal visible={modalVisivel} animationType="slide">
+        <Text style={styles.pageIndicator}>
+          Página {paginaAtual + 1} de {totalPaginas}
+        </Text>
+
+        <TouchableOpacity
+          disabled={ultimaPagina}
+          onPress={() => carregarRegioes(paginaAtual + 1)}
+          style={[styles.pageButton, ultimaPagina && { opacity: 0.4 }]}
+        >
+          <Text style={styles.pageText}>Próximo</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Modal visible={modalVisible} animationType="slide">
         <View style={styles.modalContent}>
-          <Text style={styles.subtitle}>{editandoId ? 'Editar Alerta' : 'Novo Alerta'}</Text>
-          <TextInput style={styles.input} placeholder="Local" value={local} onChangeText={setLocal} />
-          <TextInput style={styles.input} placeholder="Tipo de risco" value={tipo} onChangeText={setTipo} />
-          <Button title="Salvar" onPress={salvarAlerta} />
-          <Button title="Cancelar" color="gray" onPress={() => {
-            setEditandoId(null);
-            setModalVisivel(false);
-            setLocal('');
-            setTipo('');
-          }} />
+          <Text style={styles.subtitle}>Preencha os dados da região</Text>
+
+          <Text style={styles.label}>Nome da região</Text>
+          <TextInput style={styles.input} value={form.nome} onChangeText={(text) => setForm({ ...form, nome: text })} />
+
+          <Text style={styles.label}>Descrição do risco</Text>
+          <TextInput style={styles.input} value={form.descricao} onChangeText={(text) => setForm({ ...form, descricao: text })} />
+
+          <Text style={styles.label}>Latitude</Text>
+          <TextInput style={styles.input} keyboardType="numeric" value={String(form.latitude)} onChangeText={(text) => setForm({ ...form, latitude: parseFloat(text) })} />
+
+          <Text style={styles.label}>Longitude</Text>
+          <TextInput style={styles.input} keyboardType="numeric" value={String(form.longitude)} onChangeText={(text) => setForm({ ...form, longitude: parseFloat(text) })} />
+
+          <Text style={styles.label}>Nível de risco</Text>
+          <Picker selectedValue={form.nivelRisco} onValueChange={(value) => setForm({ ...form, nivelRisco: value as NivelRisco })} style={styles.input}>
+            <Picker.Item label="BAIXO" value="BAIXO" />
+            <Picker.Item label="MEDIO" value="MEDIO" />
+            <Picker.Item label="ALTO" value="ALTO" />
+            <Picker.Item label="CRITICO" value="CRITICO" />
+          </Picker>
+
+          <Button title="Salvar" onPress={salvar} />
+          <Button title="Cancelar" onPress={() => setModalVisible(false)} color="gray" />
         </View>
       </Modal>
-    </Animated.View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, backgroundColor: colors.gray },
-  title: { fontSize: 26, fontWeight: 'bold', color: colors.primary, textAlign: 'center', marginBottom: 20 },
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: colors.gray,
+    margin: 8,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: colors.primary,
+    marginTop: 24,
+    marginBottom: 24,
+  },
+  addButton: {
+    backgroundColor: colors.primary,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    elevation: 2,
+  },
+  addButtonText: {
+    color: colors.white,
+    fontWeight: 'bold',
+  },
+  card: {
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    padding: 20,
+    marginTop: 24 ,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 6,
+    minHeight: 240,
+    justifyContent: 'center',
+  },
+  label: {
+    fontWeight: 'bold',
+    fontFamily: 'arial',
+    color: colors.primary,
+  },
+  item: {
+    fontSize: 18,
+    color: colors.text,
+    marginBottom: 6,
+  },
+  cardButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 12,
+  },
+  editButton: {
+    backgroundColor: colors.secondary,
+    padding: 10,
+    borderRadius: 6,
+  },
+  deleteButton: {
+    backgroundColor: colors.danger,
+    padding: 10,
+    borderRadius: 6,
+  },
+  buttonText: {
+    color: colors.white,
+    fontWeight: 'bold',
+  },
+  modalContent: {
+    flex: 1,
+    padding: 24,
+    justifyContent: 'center',
+    backgroundColor: colors.gray,
+  },
+  subtitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 10,
+    color: colors.secondary,
+    textAlign: 'center',
+  },
   input: {
     borderWidth: 1,
     borderColor: colors.border,
     padding: 10,
+    marginBottom: 8,
     borderRadius: 6,
-    marginBottom: 12,
     backgroundColor: colors.white,
     color: colors.text,
   },
-  subtitle: { fontSize: 20, fontWeight: '600', color: colors.secondary, marginBottom: 10 },
-  item: { fontSize: 16, color: colors.text },
-  itemRow: {
-    backgroundColor: colors.white,
-    padding: 10,
-    marginVertical: 8,
-    borderRadius: 8,
-    elevation: 1,
+  flatList: {
+    maxHeight: 600,
   },
-  buttons: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, gap: 10 },
-  modalContent: { flex: 1, padding: 24, backgroundColor: colors.white, justifyContent: 'center' },
+  flatListContainer: {
+    paddingBottom: 20,
+  },
+  pagination: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  pageButton: {
+    backgroundColor: colors.primary,
+    padding: 10,
+    borderRadius: 6,
+  },
+  pageText: {
+    color: colors.white,
+    fontWeight: 'bold',
+  },
+  pageIndicator: {
+    fontSize: 16,
+    color: colors.text,
+    fontWeight: '500',
+  },
 });
