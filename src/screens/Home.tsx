@@ -1,14 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, Button, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
-import i18n from '../i18n/translations';
 import { RootDrawerParamList } from './../types/NavigationTypes';
 import { dispararNotificacaoFake } from './../services/notificationService';
 import { colors } from '../styles/theme';
 
-// Navegação tipada
 type NavigationProps = DrawerNavigationProp<RootDrawerParamList>;
 
 export default function Home() {
@@ -17,40 +15,50 @@ export default function Home() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Animated.View entering={FadeIn.duration(800)}>
-        <Text style={styles.title}>{i18n.t('welcome')}</Text>
-        <Text style={styles.text}>{i18n.t('intro')}</Text>
+        <Text style={styles.title}>Bem-vindo ao SafeEvac</Text>
 
         <Text style={styles.text}>
-          Através de rotas seguras e acessíveis, especialmente pensadas para pessoas com mobilidade reduzida,
-          o SafeEvac ajuda você a encontrar rapidamente o ponto de evacuação mais próximo e registrar alertas
-          em tempo real.
+          O SafeEvac é um aplicativo inteligente para evacuação de áreas de risco, com foco em acessibilidade,
+          inclusão e agilidade em situações de emergência.
         </Text>
 
-        <Text style={styles.subtitle}>O que você pode fazer:</Text>
-        <Text style={styles.bullet}>• Ver rotas seguras e acessíveis no mapa</Text>
-        <Text style={styles.bullet}>• Registrar alertas sobre locais de risco</Text>
-        <Text style={styles.bullet}>• Salvar seu perfil com preferências de evacuação</Text>
+        <Text style={styles.text}>
+          Pessoas com mobilidade reduzida contam com suporte especial por meio de rotas acessíveis e alertas
+          monitorados em tempo real.
+        </Text>
+
+        <Text style={styles.subtitle}>Funcionalidades disponíveis:</Text>
+        <Text style={styles.bullet}>• Visualizar áreas monitoradas no mapa</Text>
+        <Text style={styles.bullet}>• Registrar e gerenciar alertas de risco</Text>
+        <Text style={styles.bullet}>• Atualizar informações do seu perfil</Text>
+        <Text style={styles.bullet}>• Simular recebimento de alerta</Text>
 
         <View style={styles.cardContainer}>
           <Card
-            title={i18n.t('routes_title')}
-            description={i18n.t('routes_desc')}
-            onPress={() => navigation.navigate('Rotas Seguras')}
+            title="Mapa"
+            description="Veja as regiões de risco e sua localização atual."
+            onPress={() => navigation.navigate('Mapa')}
           />
           <Card
-            title={i18n.t('alert_title')}
-            description={i18n.t('alert_desc')}
+            title="Alertas"
+            description="Cadastre novas regiões monitoradas e consulte alertas existentes."
             onPress={() => navigation.navigate('Alertas')}
           />
           <Card
-            title={i18n.t('profile_title')}
-            description={i18n.t('profile_desc')}
+            title="Perfil"
+            description="Veja e edite seus dados pessoais cadastrados no app."
             onPress={() => navigation.navigate('Perfil')}
           />
-        </View>
-
-        <View style={{ marginTop: 24 }}>
-          <Button title="Testar Alerta" onPress={dispararNotificacaoFake} />
+          <Card
+            title="Ajuda"
+            description="Dicas, instruções e como agir em emergências."
+            onPress={() => navigation.navigate('Ajuda')}
+          />
+          <Card
+            title="Testar Alerta"
+            description="Dispara um alerta simulado para fins de demonstração."
+            onPress={dispararNotificacaoFake}
+          />
         </View>
       </Animated.View>
     </ScrollView>
@@ -71,6 +79,7 @@ const styles = StyleSheet.create({
     padding: 24,
     alignItems: 'center',
     backgroundColor: colors.gray,
+    margin: 12,
   },
   title: {
     fontSize: 26,

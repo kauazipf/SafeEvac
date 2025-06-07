@@ -1,89 +1,199 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Switch, Button, Alert, StyleSheet } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+  Modal,
+  Alert,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors } from '../styles/theme';
 
+interface Usuario {
+  nome: string;
+  email: string;
+  senha?: string;
+  telefone?: string;
+  cidade?: string;
+  estado?: string;
+}
+
 export default function Profile() {
-  const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const [mobilidadeReduzida, setMobilidadeReduzida] = useState(false);
-  const PERFIL_KEY = '@perfilUsuario';
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [form, setForm] = useState<Usuario | null>(null);
 
-  async function salvarPerfil() {
-    try {
-      await AsyncStorage.setItem(PERFIL_KEY, JSON.stringify({ nome, email, mobilidadeReduzida }));
-      Alert.alert('Perfil salvo com sucesso!');
-    } catch {
-      Alert.alert('Erro ao salvar o perfil.');
+  const carregarUsuario = async () => {
+    const userData = await AsyncStorage.getItem('usuario');
+    if (userData) {
+      const data = JSON.parse(userData);
+      setUsuario(data);
+      setForm(data);
     }
-  }
+  };
 
-  async function carregarPerfil() {
+  const salvarUsuario = async () => {
     try {
-      const data = await AsyncStorage.getItem(PERFIL_KEY);
-      if (data) {
-        const perfil = JSON.parse(data);
-        setNome(perfil.nome);
-        setEmail(perfil.email);
-        setMobilidadeReduzida(perfil.mobilidadeReduzida);
+      if (form) {
+        await AsyncStorage.setItem('usuario', JSON.stringify(form));
+        setUsuario(form);
+        setModalVisible(false);
+        Alert.alert('Sucesso', 'Dados atualizados com sucesso');
       }
     } catch {
-      Alert.alert('Erro ao carregar perfil.');
+      Alert.alert('Erro', 'Falha ao salvar os dados');
     }
-  }
+  };
 
   useEffect(() => {
-    carregarPerfil();
+    carregarUsuario();
   }, []);
 
   return (
-    <Animated.View entering={FadeIn.duration(800)} style={styles.container}>
-      <Text style={styles.title}>Seu Perfil</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Perfil do Usuário</Text>
 
-      <TextInput style={styles.input} placeholder="Nome" value={nome} onChangeText={setNome} />
-      <TextInput style={styles.input} placeholder="Email" keyboardType="email-address" value={email} onChangeText={setEmail} />
+      {usuario ? (
+        <View style={styles.card}>
+          <Text style={styles.label}>Nome:</Text>
+          <Text style={styles.item}>{usuario.nome}</Text>
 
-      <View style={styles.switchContainer}>
-        <Text style={styles.label}>Mobilidade reduzida?</Text>
-        <Switch value={mobilidadeReduzida} onValueChange={setMobilidadeReduzida} />
-      </View>
+          <Text style={styles.label}>Email:</Text>
+          <Text style={styles.item}>{usuario.email}</Text>
 
-      <Button title="Salvar Perfil" onPress={salvarPerfil} />
-    </Animated.View>
+          <Text style={styles.label}>Telefone:</Text>
+          <Text style={styles.item}>{usuario.telefone || 'Não informado'}</Text>
+
+          <Text style={styles.label}>Cidade:</Text>
+          <Text style={styles.item}>{usuario.cidade || 'Não informado'}</Text>
+
+          <Text style={styles.label}>Estado:</Text>
+          <Text style={styles.item}>{usuario.estado || 'Não informado'}</Text>
+
+          <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
+            <Text style={styles.buttonText}>Editar</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <Text style={styles.item}>Nenhum usuário logado.</Text>
+      )}
+
+      {/* MODAL PARA EDIÇÃO */}
+      <Modal visible={modalVisible} animationType="slide">
+        <View style={styles.modalContent}>
+          <Text style={styles.title}>Editar Perfil</Text>
+
+          <TextInput
+            style={styles.input}
+            value={form?.nome}
+            onChangeText={(text) => setForm({ ...form!, nome: text })}
+            placeholder="Nome"
+          />
+
+          <TextInput
+            style={styles.input}
+            value={form?.email}
+            onChangeText={(text) => setForm({ ...form!, email: text })}
+            placeholder="Email"
+            keyboardType="email-address"
+          />
+
+          <TextInput
+            style={styles.input}
+            value={form?.telefone}
+            onChangeText={(text) => setForm({ ...form!, telefone: text })}
+            placeholder="Telefone"
+            keyboardType="phone-pad"
+          />
+
+          <TextInput
+            style={styles.input}
+            value={form?.cidade}
+            onChangeText={(text) => setForm({ ...form!, cidade: text })}
+            placeholder="Cidade"
+          />
+
+          <TextInput
+            style={styles.input}
+            value={form?.estado}
+            onChangeText={(text) => setForm({ ...form!, estado: text })}
+            placeholder="Estado"
+          />
+
+          <TouchableOpacity style={styles.button} onPress={salvarUsuario}>
+            <Text style={styles.buttonText}>Salvar</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: colors.danger, marginTop: 10 }]}
+            onPress={() => setModalVisible(false)}
+          >
+            <Text style={styles.buttonText}>Cancelar</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
+  container: {
     flex: 1,
-     padding: 24,
-      backgroundColor: colors.gray 
-    },
-  title: { 
-    fontSize: 26, 
-    fontWeight: 'bold', 
+    padding: 24,
+    backgroundColor: colors.gray,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
     color: colors.primary,
-     marginBottom: 20,
-      textAlign: 'center' 
-    },
-  input: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 10,
-    borderRadius: 6,
-    marginBottom: 12,
+    margin: 32,
+    textAlign: 'center',
+  },
+  card: {
     backgroundColor: colors.white,
+    padding: 20,
+    borderRadius: 12,
+    marginBottom: 20,
+    elevation: 4,
+  },
+  label: {
+    fontWeight: 'bold',
+    color: colors.primary,
+    marginTop: 16,
+    fontSize: 18,
+  },
+  item: {
+    fontSize: 16,
     color: colors.text,
   },
-  switchContainer: { 
-    flexDirection: 'row', 
+  input: {
+    backgroundColor: colors.white,
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 12,
+    borderColor: colors.border,
+    borderWidth: 1,
+    color: colors.text,
+  },
+  button: {
+    backgroundColor: colors.primary,
+    padding: 14,
+    borderRadius: 8,
     alignItems: 'center',
-     marginBottom: 20 
-    },
-  label: { 
-    fontSize: 16,
-     color: colors.text,
-      marginRight: 10 
-    },
+    marginTop: 24,
+    marginBottom: 8,
+  },
+  buttonText: {
+    color: colors.white,
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  modalContent: {
+    flex: 1,
+    padding: 28,
+    backgroundColor: colors.gray,
+    justifyContent: 'center',
+  },
 });
