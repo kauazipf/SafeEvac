@@ -3,7 +3,8 @@ export const colors = {
   secondary: '#2C74B3',
   text: '#1E1E1E',
   white: '#FFFFFF',
-  gray: '#F5F7FA',
-  danger: '#FF6B6B',
-  border: '#CCCCCC',
+  gray: '#F2F2F2',
+  danger: '#D9534F',
+  border: '#CED4DA',
+  placeholder: '#999999', 
 };
