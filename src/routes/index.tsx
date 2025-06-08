@@ -10,6 +10,8 @@ import AlertForm from './../screens/AlertForm';
 import Profile from './../screens/Profile';
 import Help from './../screens/Help';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Image } from 'react-native';
+
 
 const Drawer = createDrawerNavigator();
 
@@ -44,8 +46,15 @@ export default function AppRoutes() {
   return (
     <Drawer.Navigator
       screenOptions={{
-        drawerPosition: 'right',
         headerTitleAlign: 'center',
+        drawerPosition: 'right', 
+        headerLeft: () => (
+          <Image
+            source={require('../../assets/logo.png')}
+            style={{ width: 40, height: 40, marginLeft: 16, borderRadius:16 }}
+            resizeMode="contain"
+          />
+        ),
       }}
     >
       <Drawer.Screen
@@ -56,10 +65,10 @@ export default function AppRoutes() {
         }}
       />
       <Drawer.Screen
-        name="Mapa"
-        component={MapScreen}
+        name="Ajuda"
+        component={Help}
         options={{
-          drawerIcon: () => <Ionicons name="map" size={20} />,
+          drawerIcon: () => <Ionicons name="help-circle" size={20} />,
         }}
       />
       <Drawer.Screen
@@ -70,17 +79,17 @@ export default function AppRoutes() {
         }}
       />
       <Drawer.Screen
+        name="Mapa"
+        component={MapScreen}
+        options={{
+          drawerIcon: () => <Ionicons name="map" size={20} />,
+        }}
+      />
+      <Drawer.Screen
         name="Perfil"
         component={Profile}
         options={{
           drawerIcon: () => <Ionicons name="person" size={20} />,
-        }}
-      />
-      <Drawer.Screen
-        name="Ajuda"
-        component={Help}
-        options={{
-          drawerIcon: () => <Ionicons name="help-circle" size={20} />,
         }}
       />
       <Drawer.Screen

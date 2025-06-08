@@ -34,6 +34,7 @@ export default function Register() {
         style={styles.input}
         placeholder="Nome completo"
         placeholderTextColor={colors.placeholder}
+        maxLength={40}
         value={nome}
         onChangeText={setNome}
       />
@@ -42,6 +43,7 @@ export default function Register() {
         style={styles.input}
         placeholder="Email"
         placeholderTextColor={colors.placeholder}
+        maxLength={50}
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -49,6 +51,7 @@ export default function Register() {
 
       <TextInput
         style={styles.input}
+        maxLength={20}
         placeholder="Senha"
         placeholderTextColor={colors.placeholder}
         value={senha}
@@ -60,6 +63,7 @@ export default function Register() {
         style={styles.input}
         placeholder="Telefone"
         placeholderTextColor={colors.placeholder}
+        maxLength={11}
         value={telefone}
         onChangeText={setTelefone}
         keyboardType="phone-pad"
@@ -67,6 +71,7 @@ export default function Register() {
 
       <TextInput
         style={styles.input}
+        maxLength={40}
         placeholder="Cidade"
         placeholderTextColor={colors.placeholder}
         value={cidade}
@@ -75,6 +80,7 @@ export default function Register() {
 
       <TextInput
         style={styles.input}
+        maxLength={20}
         placeholder="Estado"
         placeholderTextColor={colors.placeholder}
         value={estado}

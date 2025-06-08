@@ -162,16 +162,16 @@ export default function RegionForm() {
           <Text style={styles.subtitle}>Preencha os dados da região</Text>
 
           <Text style={styles.label}>Nome da região</Text>
-          <TextInput style={styles.input} value={form.nome} onChangeText={(text) => setForm({ ...form, nome: text })} />
+          <TextInput style={styles.input} value={form.nome} maxLength={20} onChangeText={(text) => setForm({ ...form, nome: text })} />
 
           <Text style={styles.label}>Descrição do risco</Text>
-          <TextInput style={styles.input} value={form.descricao} onChangeText={(text) => setForm({ ...form, descricao: text })} />
+          <TextInput style={styles.input} value={form.descricao} maxLength={30} onChangeText={(text) => setForm({ ...form, descricao: text })} />
 
           <Text style={styles.label}>Latitude</Text>
-          <TextInput style={styles.input} keyboardType="numeric" value={String(form.latitude)} onChangeText={(text) => setForm({ ...form, latitude: parseFloat(text) })} />
+          <TextInput style={styles.input} keyboardType="numeric" value={String(form.latitude)} maxLength={2} onChangeText={(text) => setForm({ ...form, latitude: parseFloat(text) })} />
 
           <Text style={styles.label}>Longitude</Text>
-          <TextInput style={styles.input} keyboardType="numeric" value={String(form.longitude)} onChangeText={(text) => setForm({ ...form, longitude: parseFloat(text) })} />
+          <TextInput style={styles.input} keyboardType="numeric" value={String(form.longitude)} maxLength={2} onChangeText={(text) => setForm({ ...form, longitude: parseFloat(text) })} />
 
           <Text style={styles.label}>Nível de risco</Text>
           <Picker selectedValue={form.nivelRisco} onValueChange={(value) => setForm({ ...form, nivelRisco: value as NivelRisco })} style={styles.input}>

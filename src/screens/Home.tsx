@@ -6,6 +6,8 @@ import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { RootDrawerParamList } from './../types/NavigationTypes';
 import { dispararNotificacaoFake } from './../services/notificationService';
 import { colors } from '../styles/theme';
+import { Image } from 'react-native';
+
 
 type NavigationProps = DrawerNavigationProp<RootDrawerParamList>;
 
@@ -15,6 +17,12 @@ export default function Home() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Animated.View entering={FadeIn.duration(800)}>
+        <Image
+          source={require('../../assets/logo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+
         <Text style={styles.title}>Bem-vindo ao Terra Segura</Text>
 
         <Text style={styles.text}>
@@ -132,5 +140,12 @@ const styles = StyleSheet.create({
   cardText: {
     fontSize: 14,
     color: colors.text,
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    alignSelf: 'center',
+    marginBottom: 16,
+    borderRadius: 24,
   },
 });
