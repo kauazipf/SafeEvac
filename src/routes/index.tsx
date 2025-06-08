@@ -28,7 +28,6 @@ function LogoutScreen() {
         style: 'destructive',
         onPress: async () => {
           await AsyncStorage.removeItem('usuarioLogado');
-          await AsyncStorage.removeItem('usuario');
           Toast.show({
             type: 'success',
             text1: 'Você saiu do aplicativo',

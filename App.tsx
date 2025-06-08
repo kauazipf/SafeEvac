@@ -19,7 +19,6 @@ export default function App() {
     }, 1000); // verifica a cada 1s
 
     return () => clearInterval(interval);
-    verificarLogin();
   }, []);
 
   if (logado === null) return null;
