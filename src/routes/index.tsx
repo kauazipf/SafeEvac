@@ -4,11 +4,11 @@ import { useNavigation } from '@react-navigation/native';
 import { Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
-import Home from './../screens/Home';
-import MapScreen from './../screens/MapScreen';
-import AlertForm from './../screens/AlertForm';
-import Profile from './../screens/Profile';
-import Help from './../screens/Help';
+import Home from '../screens/Home';
+import MapScreen from '../screens/MapScreen';
+import AlertForm from '../screens/AlertForm';
+import Profile from '../screens/Profile';
+import Help from '../screens/Help';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'react-native';
 

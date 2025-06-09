@@ -18,10 +18,12 @@ import {
   atualizarRegiao,
   deletarRegiao,
 } from '../services/regionService';
-import { colors } from '../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../styles/ThemeContext';
 
 export default function RegionForm() {
+  const { theme } = useTheme(); // <- hook DENTRO do componente
+
   const [regioes, setRegioes] = useState<Regiao[]>([]);
   const [form, setForm] = useState<Regiao>({
     nome: '',
@@ -100,6 +102,130 @@ export default function RegionForm() {
     carregarRegioes();
   }, []);
 
+  // ESTILOS DENTRO do componente, usando theme
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 16,
+      backgroundColor: theme.colors.card,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: theme.colors.primary,
+      marginTop: 32,
+      marginBottom: 24,
+    },
+    addButton: {
+      backgroundColor: theme.colors.primary,
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      borderRadius: 6,
+      elevation: 2,
+      marginTop: 16,
+    },
+    addButtonText: {
+      color: theme.colors.white,
+      fontWeight: 'bold',
+    },
+    card: {
+      backgroundColor: theme.colors.background,
+      borderRadius: 12,
+      padding: 20,
+      marginTop: 12,
+      marginBottom: 12,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 6,
+      elevation: 6,
+      minHeight: 240,
+      justifyContent: 'center',
+    },
+    label: {
+      fontWeight: 'bold',
+      fontFamily: 'arial',
+      color: theme.colors.primary,
+    },
+    item: {
+      fontSize: 18,
+      color: theme.colors.text,
+      marginBottom: 6,
+    },
+    cardButtons: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 12,
+    },
+    editButton: {
+      backgroundColor: theme.colors.secondary,
+      padding: 10,
+      borderRadius: 6,
+    },
+    deleteButton: {
+      backgroundColor: theme.colors.danger,
+      padding: 10,
+      borderRadius: 6,
+    },
+    buttonText: {
+      color: theme.colors.white,
+      fontWeight: 'bold',
+    },
+    modalContent: {
+      flex: 1,
+      padding: 24,
+      justifyContent: 'center',
+      backgroundColor: theme.colors.card,
+    },
+    subtitle: {
+      fontSize: 20,
+      fontWeight: '600',
+      marginBottom: 10,
+      color: theme.colors.secondary,
+      textAlign: 'center',
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      padding: 10,
+      marginBottom: 8,
+      borderRadius: 6,
+      backgroundColor: theme.colors.background,
+      color: theme.colors.text,
+    },
+    flatList: {
+      maxHeight: 550,
+    },
+    flatListContainer: {
+      paddingBottom: 20,
+    },
+    pagination: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginTop: 8,
+    },
+    pageButton: {
+      backgroundColor: theme.colors.primary,
+      padding: 10,
+      borderRadius: 6,
+    },
+    pageText: {
+      color: theme.colors.white,
+      fontWeight: 'bold',
+    },
+    pageIndicator: {
+      fontSize: 16,
+      color: theme.colors.text,
+      fontWeight: '500',
+    },
+  });
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -168,10 +294,10 @@ export default function RegionForm() {
           <TextInput style={styles.input} value={form.descricao} maxLength={30} onChangeText={(text) => setForm({ ...form, descricao: text })} />
 
           <Text style={styles.label}>Latitude</Text>
-          <TextInput style={styles.input} keyboardType="numeric" value={String(form.latitude)} maxLength={2} onChangeText={(text) => setForm({ ...form, latitude: parseFloat(text) })} />
+          <TextInput style={styles.input} keyboardType="numeric" value={String(form.latitude)} onChangeText={(text) => setForm({ ...form, latitude: parseFloat(text) })} />
 
           <Text style={styles.label}>Longitude</Text>
-          <TextInput style={styles.input} keyboardType="numeric" value={String(form.longitude)} maxLength={2} onChangeText={(text) => setForm({ ...form, longitude: parseFloat(text) })} />
+          <TextInput style={styles.input} keyboardType="numeric" value={String(form.longitude)} onChangeText={(text) => setForm({ ...form, longitude: parseFloat(text) })} />
 
           <Text style={styles.label}>Nível de risco</Text>
           <Picker selectedValue={form.nivelRisco} onValueChange={(value) => setForm({ ...form, nivelRisco: value as NivelRisco })} style={styles.input}>
@@ -188,127 +314,3 @@ export default function RegionForm() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: colors.gray,
-    margin: 8,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.primary,
-    marginTop: 32,
-    marginBottom: 24,
-  },
-  addButton: {
-    backgroundColor: colors.primary,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    elevation: 2,
-    marginTop: 16,
-  },
-  addButtonText: {
-    color: colors.white,
-    fontWeight: 'bold',
-  },
-  card: {
-    backgroundColor: colors.white,
-    borderRadius: 12,
-    padding: 20,
-    marginTop: 12 ,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 6,
-    minHeight: 240,
-    justifyContent: 'center',
-  },
-  label: {
-    fontWeight: 'bold',
-    fontFamily: 'arial',
-    color: colors.primary,
-  },
-  item: {
-    fontSize: 18,
-    color: colors.text,
-    marginBottom: 6,
-  },
-  cardButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 12,
-  },
-  editButton: {
-    backgroundColor: colors.secondary,
-    padding: 10,
-    borderRadius: 6,
-  },
-  deleteButton: {
-    backgroundColor: colors.danger,
-    padding: 10,
-    borderRadius: 6,
-  },
-  buttonText: {
-    color: colors.white,
-    fontWeight: 'bold',
-  },
-  modalContent: {
-    flex: 1,
-    padding: 24,
-    justifyContent: 'center',
-    backgroundColor: colors.gray,
-  },
-  subtitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 10,
-    color: colors.secondary,
-    textAlign: 'center',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 10,
-    marginBottom: 8,
-    borderRadius: 6,
-    backgroundColor: colors.white,
-    color: colors.text,
-  },
-  flatList: {
-    maxHeight: 550,
-  },
-  flatListContainer: {
-    paddingBottom: 20,
-  },
-  pagination: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  pageButton: {
-    backgroundColor: colors.primary,
-    padding: 10,
-    borderRadius: 6,
-  },
-  pageText: {
-    color: colors.white,
-    fontWeight: 'bold',
-  },
-  pageIndicator: {
-    fontSize: 16,
-    color: colors.text,
-    fontWeight: '500',
-  },
-});

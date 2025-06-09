@@ -1,8 +1,45 @@
 import React from 'react';
 import { Text, StyleSheet, ScrollView } from 'react-native';
-import { colors } from '../styles/theme';
+import { useTheme } from '../styles/ThemeContext';
 
 export default function Help() {
+  const { theme } = useTheme();
+
+  const styles = StyleSheet.create({
+    container: {
+      height: 1000,
+      padding: 24,
+      backgroundColor: theme.colors.card,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: theme.colors.primary,
+      marginBottom: 20,
+      textAlign: 'center',
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.colors.secondary,
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    text: {
+      fontSize: 15,
+      color: theme.colors.text,
+      lineHeight: 22,
+      textAlign: 'justify',
+    },
+    footer: {
+      marginTop: 30,
+      fontSize: 14,
+      textAlign: 'center',
+      color: theme.colors.text,
+      opacity: 0.7,
+    },
+  });
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Ajuda e Instruções</Text>
@@ -27,7 +64,7 @@ export default function Help() {
 
       <Text style={styles.sectionTitle}> 📱 Contato e Suporte </Text>
       <Text style={styles.text}>
-        Para mais informações ou em caso de problemas com o aplicativo, entre em contato com a equipe do Terra Segura.
+        Para mais informações ou em caso de problemas com o aplicativo, entre em contato com a equipe do Terra Segura
         através do e-mail kauan123.zipf@gmail.com.
       </Text>
 
@@ -35,37 +72,3 @@ export default function Help() {
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 24,
-    backgroundColor: colors.gray,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.primary,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.secondary,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  text: {
-    fontSize: 15,
-    color: colors.text,
-    lineHeight: 22,
-    textAlign: 'justify',
-  },
-  footer: {
-    marginTop: 30,
-    fontSize: 14,
-    textAlign: 'center',
-    color: colors.text,
-    opacity: 0.7,
-  },
-});

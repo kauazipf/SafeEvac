@@ -4,6 +4,7 @@ import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppRoutes from './src/routes/Index';
 import AuthStack from './src/routes/AuthStack';
+import { ThemeProvider } from './src/styles/ThemeContext';
 
 export default function App() {
   const [logado, setLogado] = useState<boolean | null>(null);
@@ -16,7 +17,7 @@ export default function App() {
 
     const interval = setInterval(() => {
       verificarLogin();
-    }, 1000); // verifica a cada 1s
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
@@ -25,10 +26,12 @@ export default function App() {
 
   return (
     <>
-    <NavigationContainer>
-      {logado ? <AppRoutes /> : <AuthStack />}
-    </NavigationContainer>
-    <Toast />
-  </>
+    <ThemeProvider>
+      <NavigationContainer>
+        {logado ? <AppRoutes /> : <AuthStack />}
+      </NavigationContainer>
+      <Toast />
+    </ThemeProvider>
+    </>
   );
 }

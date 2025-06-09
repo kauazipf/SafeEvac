@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { colors } from '../styles/theme';
+import { useTheme } from '../styles/ThemeContext';
 
 interface Usuario {
   nome: string;
@@ -21,6 +21,7 @@ interface Usuario {
 }
 
 export default function Profile() {
+  const { theme, toggleTheme, isDark } = useTheme();
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [form, setForm] = useState<Usuario | null>(null);
@@ -51,6 +52,80 @@ export default function Profile() {
     carregarUsuario();
   }, []);
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 24,
+      backgroundColor: theme.colors.card,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: theme.colors.primary,
+      margin: 32,
+      textAlign: 'center',
+    },
+    card: {
+      backgroundColor: isDark ? '#fff6' : theme.colors.background,
+      padding: 20,
+      borderRadius: 12,
+      marginBottom: 20,
+      elevation: 4,
+    },
+    label: {
+      fontWeight: 'bold',
+      color: theme.colors.primary,
+      marginTop: 16,
+      fontSize: 18,
+    },
+    item: {
+      fontSize: 16,
+      color: theme.colors.text,
+    },
+    input: {
+      backgroundColor: theme.colors.background,
+      borderRadius: 8,
+      padding: 16,
+      marginTop: 12,
+      borderColor: theme.colors.border,
+      borderWidth: 1,
+      color: theme.colors.text,
+    },
+    button: {
+      backgroundColor: theme.colors.primary,
+      padding: 14,
+      borderRadius: 8,
+      alignItems: 'center',
+      marginTop: 24,
+      marginBottom: 8,
+    },
+    buttonText: {
+      color: theme.colors.white,
+      fontWeight: 'bold',
+      fontSize: 18,
+    },
+    modalContent: {
+      flex: 1,
+      padding: 28,
+      backgroundColor: theme.colors.card,
+      justifyContent: 'center',
+    },
+    cancelButton: {
+      backgroundColor: theme.colors.danger,
+      padding: 14,
+      borderRadius: 8,
+      alignItems: 'center',
+      marginTop: 10,
+    },
+    themeButton: {
+      backgroundColor: theme.colors.secondary,
+      padding: 14,
+      borderRadius: 8,
+      alignItems: 'center',
+      marginTop: 8,
+    },
+  });
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Perfil do Usuário</Text>
@@ -75,12 +150,18 @@ export default function Profile() {
           <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
             <Text style={styles.buttonText}>Editar</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity style={styles.themeButton} onPress={toggleTheme}>
+            <Text style={styles.buttonText}>
+              {isDark ? 'Modo Claro' : 'Modo Escuro'}
+            </Text>
+          </TouchableOpacity>
+
         </View>
       ) : (
         <Text style={styles.item}>Nenhum usuário logado.</Text>
       )}
 
-      {/* MODAL PARA EDIÇÃO */}
       <Modal visible={modalVisible} animationType="slide">
         <View style={styles.modalContent}>
           <Text style={styles.title}>Editar Perfil</Text>
@@ -90,6 +171,7 @@ export default function Profile() {
             value={form?.nome}
             onChangeText={(text) => setForm({ ...form!, nome: text })}
             placeholder="Nome"
+            placeholderTextColor={theme.colors.placeholder}
           />
 
           <TextInput
@@ -98,6 +180,7 @@ export default function Profile() {
             onChangeText={(text) => setForm({ ...form!, email: text })}
             placeholder="Email"
             keyboardType="email-address"
+            placeholderTextColor={theme.colors.placeholder}
           />
 
           <TextInput
@@ -106,6 +189,7 @@ export default function Profile() {
             onChangeText={(text) => setForm({ ...form!, telefone: text })}
             placeholder="Telefone"
             keyboardType="phone-pad"
+            placeholderTextColor={theme.colors.placeholder}
           />
 
           <TextInput
@@ -113,6 +197,7 @@ export default function Profile() {
             value={form?.cidade}
             onChangeText={(text) => setForm({ ...form!, cidade: text })}
             placeholder="Cidade"
+            placeholderTextColor={theme.colors.placeholder}
           />
 
           <TextInput
@@ -120,16 +205,14 @@ export default function Profile() {
             value={form?.estado}
             onChangeText={(text) => setForm({ ...form!, estado: text })}
             placeholder="Estado"
+            placeholderTextColor={theme.colors.placeholder}
           />
 
           <TouchableOpacity style={styles.button} onPress={salvarUsuario}>
             <Text style={styles.buttonText}>Salvar</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: colors.danger, marginTop: 10 }]}
-            onPress={() => setModalVisible(false)}
-          >
+          <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
             <Text style={styles.buttonText}>Cancelar</Text>
           </TouchableOpacity>
         </View>
@@ -137,63 +220,3 @@ export default function Profile() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-    backgroundColor: colors.gray,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.primary,
-    margin: 32,
-    textAlign: 'center',
-  },
-  card: {
-    backgroundColor: colors.white,
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 20,
-    elevation: 4,
-  },
-  label: {
-    fontWeight: 'bold',
-    color: colors.primary,
-    marginTop: 16,
-    fontSize: 18,
-  },
-  item: {
-    fontSize: 16,
-    color: colors.text,
-  },
-  input: {
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    padding: 16,
-    marginTop: 12,
-    borderColor: colors.border,
-    borderWidth: 1,
-    color: colors.text,
-  },
-  button: {
-    backgroundColor: colors.primary,
-    padding: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 8,
-  },
-  buttonText: {
-    color: colors.white,
-    fontWeight: 'bold',
-    fontSize: 18,
-  },
-  modalContent: {
-    flex: 1,
-    padding: 28,
-    backgroundColor: colors.gray,
-    justifyContent: 'center',
-  },
-});

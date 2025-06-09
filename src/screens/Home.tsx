@@ -1,18 +1,94 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { RootDrawerParamList } from './../types/NavigationTypes';
 import { dispararNotificacaoFake } from './../services/notificationService';
-import { colors } from '../styles/theme';
-import { Image } from 'react-native';
-
+import { useTheme } from '../styles/ThemeContext';
 
 type NavigationProps = DrawerNavigationProp<RootDrawerParamList>;
 
 export default function Home() {
   const navigation = useNavigation<NavigationProps>();
+  const { theme } = useTheme();
+
+  const styles = StyleSheet.create({
+    container: {
+      padding: 24,
+      alignItems: 'center',
+      backgroundColor: theme.colors.card,
+      marginBottom: 12,
+    },
+    title: {
+      fontSize: 26,
+      fontWeight: 'bold',
+      marginBottom: 10,
+      textAlign: 'center',
+      color: theme.colors.primary,
+    },
+    text: {
+      fontSize: 16,
+      marginVertical: 10,
+      textAlign: 'center',
+      color: theme.colors.text,
+    },
+    subtitle: {
+      fontSize: 20,
+      fontWeight: '600',
+      marginTop: 20,
+      marginBottom: 10,
+      textAlign: 'center',
+      color: theme.colors.secondary,
+    },
+    bullet: {
+      fontSize: 16,
+      textAlign: 'left',
+      alignSelf: 'stretch',
+      marginVertical: 4,
+      color: theme.colors.text,
+    },
+    cardContainer: {
+      marginTop: 20,
+      width: '100%',
+      marginBottom: 32,
+    },
+    card: {
+      backgroundColor: theme.colors.background,
+      borderRadius: 12,
+      padding: 20,
+      marginVertical: 12,
+      elevation: 2,
+      borderLeftWidth: 5,
+      borderLeftColor: theme.colors.primary,
+    },
+    cardTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginBottom: 6,
+      color: theme.colors.primary,
+    },
+    cardText: {
+      fontSize: 14,
+      color: theme.colors.text,
+    },
+    logo: {
+      width: 120,
+      height: 120,
+      alignSelf: 'center',
+      marginBottom: 16,
+      borderRadius: 24,
+    },
+  });
+
+  function Card({ title, description, onPress }: { title: string; description: string; onPress: () => void }) {
+    return (
+      <TouchableOpacity style={styles.card} onPress={onPress}>
+        <Text style={styles.cardTitle}>{title}</Text>
+        <Text style={styles.cardText}>{description}</Text>
+      </TouchableOpacity>
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -72,80 +148,3 @@ export default function Home() {
     </ScrollView>
   );
 }
-
-function Card({ title, description, onPress }: { title: string; description: string; onPress: () => void }) {
-  return (
-    <TouchableOpacity style={styles.card} onPress={onPress}>
-      <Text style={styles.cardTitle}>{title}</Text>
-      <Text style={styles.cardText}>{description}</Text>
-    </TouchableOpacity>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 24,
-    alignItems: 'center',
-    backgroundColor: colors.gray,
-    margin: 12,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-    color: colors.primary,
-  },
-  text: {
-    fontSize: 16,
-    marginVertical: 10,
-    textAlign: 'center',
-    color: colors.text,
-  },
-  subtitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginTop: 20,
-    marginBottom: 10,
-    textAlign: 'center',
-    color: colors.secondary,
-  },
-  bullet: {
-    fontSize: 16,
-    textAlign: 'left',
-    alignSelf: 'stretch',
-    marginVertical: 4,
-    color: colors.text,
-  },
-  cardContainer: {
-    marginTop: 20,
-    width: '100%',
-    marginBottom: 32,
-  },
-  card: {
-    backgroundColor: colors.white,
-    borderRadius: 12,
-    padding: 20,
-    marginVertical: 12,
-    elevation: 2,
-    borderLeftWidth: 5,
-    borderLeftColor: colors.primary,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 6,
-    color: colors.primary,
-  },
-  cardText: {
-    fontSize: 14,
-    color: colors.text,
-  },
-  logo: {
-    width: 120,
-    height: 120,
-    alignSelf: 'center',
-    marginBottom: 16,
-    borderRadius: 24,
-  },
-});
